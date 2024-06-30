@@ -10,18 +10,17 @@ if not exist "%SCRIPT_DIR%" (
 )
 
 REM Create or overwrite the PowerShell script file
-(
-    echo Get-ChildItem "HKCU:\Control Panel\NotifyIconSettings" ^| ForEach-Object { Set-ItemProperty -Path $_.PSPath -Name "IsPromoted" -Type DWORD -Value 1 }
-) > "%SCRIPT_PATH%"
+echo Get-ChildItem ^"HKCU:\Control Panel\NotifyIconSettings^" ^| ForEach-Object { Set-ItemProperty -Path $_.PSPath -Name ^"IsPromoted^" -Type DWORD -Value 1 } > "%SCRIPT_PATH%"
 
 REM Create the shortcut if it doesn't exist
 set "SHORTCUT_PATH=%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\update-notifyicons.lnk"
 set "SHORTCUT_TARGET=powershell.exe"
-set "SHORTCUT_ARGUMENTS=-ExecutionPolicy Bypass -File \"%SCRIPT_PATH%\""
+set "SHORTCUT_ARGUMENTS=-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"%SCRIPT_PATH%\""
 set "SHORTCUT_DESCRIPTION=Show all icons in the notification area"
 
 if not exist "%SHORTCUT_PATH%" (
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "& {$Shell = New-Object -ComObject WScript.Shell; $Shortcut = $Shell.CreateShortcut('%SHORTCUT_PATH%'); $Shortcut.TargetPath = '%SHORTCUT_TARGET%'; $Shortcut.Arguments = '%SHORTCUT_ARGUMENTS%'; $Shortcut.Description = '%SHORTCUT_DESCRIPTION%'; $Shortcut.Save()}"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    " $Shell = New-Object -ComObject WScript.Shell; $Shortcut = $Shell.CreateShortcut('%SHORTCUT_PATH%'); $Shortcut.TargetPath = '%SHORTCUT_TARGET%'; $Shortcut.Arguments = '%SHORTCUT_ARGUMENTS%'; $Shortcut.Description = '%SHORTCUT_DESCRIPTION%'; $Shortcut.WindowStyle = 7; $Shortcut.Save()"
 )
 
 exit /b
